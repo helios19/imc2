@@ -1,0 +1,91 @@
+<div class="generic-container">
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+
+        <div class="panel-heading text-center">
+            <span class="lead ">Rock ** Paper ** Scissors</span>
+        </div>
+
+        <div class="panel-body">
+            <div class="formcontainer">
+                <div class="alert alert-danger" role="alert" ng-if="ctrl.errorMessage">{{ctrl.errorMessage}}</div>
+                <form ng-submit="ctrl.submit()" name="myForm" class="form-horizontal">
+                    <input type="hidden" ng-model="ctrl.game.uuid" />
+
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="col-md-2 control-lable" for="playerSymbol">You</label>
+                            <div class="col-md-7">
+                                <select ng-model="ctrl.game.playerSymbol" id="playerSymbol" class="gamename form-control input-sm" placeholder="Enter customer identifier" required >
+                                    <option selected value="ROCK">ROCK</option>
+                                    <option value="PAPER">PAPER</option>
+                                    <option value="SCISSORS">SCISSORS</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="col-md-2 control-lable" for="month">Computer</label>
+                            <div class="col-md-7">
+                                <input type="text" ng-model="ctrl.game.computerSymbol" id="month" class="form-control input-sm" disabled/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-if="ctrl.gameResult">
+                        <div class="form-group col-md-12">
+                            <label class="col-md-2 control-lable">Result</label>
+                            <div class="col-md-7">
+                                <p class="mark text-left" ng-if="ctrl.gameResult == 'DRAW'">DRAW</p>
+                                <p class="alert-success text-left" ng-if="ctrl.gameResult == 'WIN'">YOU WON!!</p>
+                                <p class="alert-danger text-left" ng-if="ctrl.gameResult == 'LOSE'">YOU LOST</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-actions floatRight">
+                            <input type="submit"  value="Play" class="btn btn-primary btn-sm" ng-disabled="myForm.$invalid || myForm.$pristine">
+                            <button type="button" ng-click="ctrl.reset()" class="btn btn-warning btn-sm">Restart</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading"><span class="lead">Previous Games</span></div>
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>DATE</th>
+                        <th>PLAYER</th>
+                        <th>COMPUTER</th>
+                        <th>RESULT</th>
+                        <th width="20"></th>
+                        <th width="180"><p class="mark text-center" ng-if="ctrl.gameMaxTries">Games Played: {{ctrl.gameCounter}} / {{ctrl.gameMaxTries}}</p></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="u in ctrl.previousGames"
+                        ng-class="{'mark': u.result == 'DRAW', 'alert-success': u.result == 'WIN', 'alert-danger': u.result == 'LOSE'}">
+                        <td>{{$index+1}}</td>
+                        <td>{{u.customer}}</td>
+                        <td>{{u.date}}</td>
+                        <td>{{u.player}}</td>
+                        <td>{{u.computer}}</td>
+                        <td>{{u.result}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

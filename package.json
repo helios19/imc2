@@ -1,0 +1,9 @@
+{
+  "name": "rockPaperScissors",
+  "version": "1.0.0",
+  "description": "Rock Paper Scissors app",
+  "scripts": {
+    "init-test": "karma init",
+    "test-unit": "karma start test/unit/conf/karma.js"
+  }
+}
