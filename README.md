@@ -65,10 +65,10 @@ Once the application has started, to access the UI, just open your favorite brow
 is not used by another process. Then you should be able to access the RPS game main page.
 
 __Rock Paper Scissors main page__
-![Rock Paper Scissors main page](rps-main-page.png)
+![Rock Paper Scissors main page](img/rps-main-page.png)
 
 __Rock Paper Scissors list page__
-![Rock Paper Scissors list page](rps-list-page.png)
+![Rock Paper Scissors list page](img/rps-list-page.png)
 
 
 Requirement assumptions
