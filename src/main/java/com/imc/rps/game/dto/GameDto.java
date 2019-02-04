@@ -4,7 +4,7 @@ package com.imc.rps.game.dto;
 import lombok.Data;
 
 /**
- * Game DTO class representing a customer game.
+ * Game DTO class holding the game summary details.
  */
 @Data
 public class GameDto {

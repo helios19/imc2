@@ -18,12 +18,12 @@ angular.module('rockPaperScissors').factory('GameService',
                 $http.get(urls.GAME_SERVICE_API + '/' + game.playerSymbol + '/' + uuid)
                     .then(
                         function (response) {
-                            console.log('Fetched successfully customer games');
+                            console.log('Fetched successfully game result');
                             $localStorage.previousGames = response.data.history;
                             deferred.resolve(response);
                         },
                         function (errResponse) {
-                            console.error('Error while loading games');
+                            console.error('Error while loading game result');
                             deferred.reject(errResponse);
                         }
                     );

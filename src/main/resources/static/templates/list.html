@@ -16,7 +16,7 @@
                         <div class="form-group col-md-12">
                             <label class="col-md-2 control-lable" for="playerSymbol">You</label>
                             <div class="col-md-7">
-                                <select ng-model="ctrl.game.playerSymbol" id="playerSymbol" class="gamename form-control input-sm" placeholder="Enter customer identifier" required >
+                                <select ng-model="ctrl.game.playerSymbol" id="playerSymbol" class="gamename form-control input-sm" required >
                                     <option selected value="ROCK">ROCK</option>
                                     <option value="PAPER">PAPER</option>
                                     <option value="SCISSORS">SCISSORS</option>
@@ -77,7 +77,6 @@
                     <tr ng-repeat="u in ctrl.previousGames"
                         ng-class="{'mark': u.result == 'DRAW', 'alert-success': u.result == 'WIN', 'alert-danger': u.result == 'LOSE'}">
                         <td>{{$index+1}}</td>
-                        <td>{{u.customer}}</td>
                         <td>{{u.date}}</td>
                         <td>{{u.player}}</td>
                         <td>{{u.computer}}</td>

@@ -30,7 +30,7 @@ public interface GameService {
     Optional<Game> findById(String id);
 
     /**
-     * Return a list of {@link Game} given {@code customerId} argument.
+     * Return a list of {@link Game} given {@code uuid} argument.
      *
      * @param uuid Game uuid
      * @return List of game history found for a given uuid

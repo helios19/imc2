@@ -23,7 +23,7 @@ import static com.imc.rps.common.utils.ClassUtils.*;
 
 /**
  * Game controller class defining the HTTP operations available for the {@link Game} resource. This controller
- * is mainly used to return a customer game summary including the result.
+ * is mainly used to return a game summary including the result.
  *
  * @see Game
  * @see GameSummary

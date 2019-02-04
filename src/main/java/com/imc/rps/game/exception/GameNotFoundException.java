@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class GameNotFoundException extends RuntimeException {
-    public GameNotFoundException(String customerId) {
-        super("No game found for customer id:" + customerId);
+    public GameNotFoundException(String uuid) {
+        super("No game found for uuid:" + uuid);
     }
 }
