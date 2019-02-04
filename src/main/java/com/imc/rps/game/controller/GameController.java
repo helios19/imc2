@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.imc.rps.common.utils.ClassUtils.*;
@@ -113,7 +113,7 @@ public class GameController {
                 .computer(computer.name())
                 .result(gameResult.name())
                 .uuid(gameUUID)
-                .date(asDate(LocalDate.now())).build();
+                .date(asDate(LocalDateTime.now())).build();
     }
 
     /**

@@ -90,8 +90,6 @@ public class GameServiceTest {
     }
 
     @Configuration
-//    @EnableAutoConfiguration
-//    @EnableMongoRepositories(basePackages = "com.imc.rps.game.repository")
     @ComponentScan({
             "com.imc.rps.game.service"
     })

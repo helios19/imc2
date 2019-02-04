@@ -8,7 +8,6 @@ import com.imc.rps.game.model.Game;
 import com.imc.rps.game.model.GameSymbolEnum;
 import org.modelmapper.ModelMapper;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -26,7 +25,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 public class ClassUtils {
     public static final String COUNTERS_COLLECTION_NAME = "counters";
     public static final String GAMES_COLLECTION_NAME = "games";
-    public static final String DATE_FORMAT_PATTERN = "yyyyMMdd";
+    public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
     public static final DateTimeFormatter FORMATTER = ofPattern("d/MM/yyyy h:mm:ss a");
     public static final int DEFAULT_PAGE_SIZE = 50;
     public static final ModelMapper MODEL_MAPPER = new ModelMapper();
@@ -60,11 +59,11 @@ public class ClassUtils {
     /**
      * Converts {@code localDate} argument to {@link Date}.
      *
-     * @param localDate Local date to convert
+     * @param localDateTime Local datetime to convert
      * @return Date instance
      */
-    public static Date asDate(LocalDate localDate) {
-        return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+    public static Date asDate(LocalDateTime localDateTime) {
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     /**
