@@ -119,7 +119,10 @@ The UI of this application has been implemented using AngularJS 1.3 (webjar) for
 the source can be found in the `resources/static` folder of this project. The UI
 pages are responsive and built using `Bootstrap` making the view net and concise.
 
+__Rock Paper Scissors main page__
 ![Rock Paper Scissors main page](rps-main-page.png)
+
+__Rock Paper Scissors list page__
 ![Rock Paper Scissors list page](rps-list-page.png)
 
 
