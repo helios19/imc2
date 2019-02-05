@@ -17,7 +17,7 @@ given the list of third party dependencies, the build process might vary from
 1 to 2 mins depending on your local gradle repository and your network bandwidth.
 
 
-| WARNING: Note that this application must be run with a jdk 8 version. Any attempt to run it on a more recent version of the jdk (e.g jdk 9) will fail (Spring context won't start up) due to an incompatibility between Spring 4.X and the new features released from jdk 9. |
+| WARNING: Note that this application must run against a jdk 8. Any attempt to run it on a more recent version of the jdk (e.g jdk 9) will fail (Spring context won't start up). This is due to an incompatibility between Spring 4.X / Spring Boot 1.X and the new features released from jdk 9. Refer to this [link](https://stackoverflow.com/questions/46671472/illegal-reflective-access-by-org-springframework-cglib-core-reflectutils1/46671473#46671473) for more details. |
 | --- |
 
 Then, to run the application, simply type:
