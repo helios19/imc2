@@ -16,9 +16,9 @@ simply add this `-x test` option to the above command. Also, take note that,
 given the list of third party dependencies, the build process might vary from
 1 to 2 mins depending on your local gradle repository and your network bandwidth.
 
-<aside class="notice">
-Note that this application must be run with a jdk 8 version. Any attempt to run it on a more recent version of the jdk (e.g jdk 9) will fail (Spring context won't start up) due to an incompatibility between Spring 4.X and the new features released from jdk 9.
-</aside>
+
+| WARNING: Note that this application must be run with a jdk 8 version. Any attempt to run it on a more recent version of the jdk (e.g jdk 9) will fail (Spring context won't start up) due to an incompatibility between Spring 4.X and the new features released from jdk 9. |
+| --- |
 
 Then, to run the application, simply type:
 
