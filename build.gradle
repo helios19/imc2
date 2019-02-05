@@ -11,7 +11,7 @@ buildscript {
     ext['commonsLangVersion'] = '3.4'
     ext['slf4jVersion'] = '1.7.12'
     ext['logbackVersion'] = '1.1.7'
-    ext['lombokVersion'] = '1.16.18'
+    ext['lombokVersion'] = '1.16.20'
     ext['modelMapperVersion'] = '1.1.0'
     ext['owaspVersion'] = '2.0.1'
 
@@ -136,7 +136,7 @@ bootRun {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.3.1'
+    gradleVersion = '4.10'
 }
 
 task buildDocker(type: Docker, dependsOn: build) {
