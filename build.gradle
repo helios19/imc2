@@ -96,7 +96,7 @@ dependencies {
     // apache commons lang
     compile "org.apache.commons:commons-lang3:${commonsLangVersion}"
 
-//    // embedded mongodb
+    // embedded mongodb
     compile "de.flapdoodle.embed:de.flapdoodle.embed.mongo:${embedMongoVersion}"
 
     // jackson datatype
