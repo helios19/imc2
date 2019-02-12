@@ -69,6 +69,14 @@ public class GameController {
         return getGameSummaryResponse(playerSymbol, gameUUID);
     }
 
+    /**
+     * Generates game summary response object.
+     *
+     * @param playerSymbol Player symbol
+     * @param gameUUID     Game UUID
+     * @return Game summary result
+     * @throws GameNotFoundException if no game for the given playerSymbol and gameUUID can be found
+     */
     private ResponseEntity<GameSummary> getGameSummaryResponse(String playerSymbol, String gameUUID) {
 
         if (!isValidateSymbol(playerSymbol)) {

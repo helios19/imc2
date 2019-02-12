@@ -78,7 +78,6 @@ public class GameRepositoryImpl implements GameRepositoryCustom {
 
     private Update getUpdate(Game game) {
         return new Update()
-//                .set("id", new Integer(counterService.getNextSequence("games")).toString())
                 .set("player", game.getPlayer())
                 .set("computer", game.getComputer())
                 .set("date", game.getDate())
