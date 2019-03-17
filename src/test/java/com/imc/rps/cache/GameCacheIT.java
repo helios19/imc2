@@ -3,10 +3,10 @@ package com.imc.rps.cache;
 import com.google.common.collect.Lists;
 import com.imc.rps.common.utils.ClassUtils;
 import com.imc.rps.game.model.Game;
-import com.imc.rps.game.repository.GameRepository;
 import com.imc.rps.game.model.GameResultEnum;
-import com.imc.rps.game.service.GameService;
 import com.imc.rps.game.model.GameSymbolEnum;
+import com.imc.rps.game.repository.GameRepository;
+import com.imc.rps.game.service.GameService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class GameCacheIT {
 
     @Autowired
     @InjectMocks
-    private GameService gameService;
+    private GameService<Game, GameRepository> gameService;
 
     @Mock
     private GameRepository repository;
@@ -136,7 +136,7 @@ public class GameCacheIT {
     public static class TestCacheConfig {
         @Bean
         CacheManager cacheManager() {
-            return new ConcurrentMapCacheManager(ClassUtils.GAMES_COLLECTION_NAME);
+            return new ConcurrentMapCacheManager(ClassUtils.GAMES_COLLECTION_NAME, ClassUtils.GAME_MULTIPLAYERS_COLLECTION_NAME);
         }
     }
 

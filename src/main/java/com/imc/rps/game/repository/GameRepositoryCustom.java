@@ -1,17 +1,16 @@
 package com.imc.rps.game.repository;
 
-import com.imc.rps.game.model.Game;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface GameRepositoryCustom {
+public interface GameRepositoryCustom<T> {
 
-    void saveOrUpdate(Game... game);
+    void saveOrUpdate(T... t);
 
-    List<Game> findByUuid(String uuid);
+    List<T> findByUuid(String uuid);
 
     MongoTemplate getMongoTemplate();
 

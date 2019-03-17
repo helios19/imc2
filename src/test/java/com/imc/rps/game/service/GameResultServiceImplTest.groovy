@@ -1,5 +1,6 @@
 package com.imc.rps.game.service
 
+import com.imc.rps.game.model.GameMultiPlayerResultEnum
 import com.imc.rps.game.model.GameResultEnum
 import com.imc.rps.game.model.GameSymbolEnum
 import spock.lang.Specification
@@ -33,4 +34,30 @@ class GameResultServiceImplTest extends Specification {
         GameSymbolEnum.SCISSORS | GameSymbolEnum.ROCK     | GameResultEnum.LOSE
 
     }
+
+    @Unroll
+    def "should return correct multiplayer game result"() {
+
+        given:
+
+        when: "invoking gameResult service"
+        GameMultiPlayerResultEnum computedResult = gameResultService.computeResult(players)
+
+        then:
+        computedResult == result
+
+        where:
+        players                                                     | result
+        [GameSymbolEnum.ROCK]                                       | GameMultiPlayerResultEnum.WIN
+        [GameSymbolEnum.PAPER, GameSymbolEnum.PAPER]                | GameMultiPlayerResultEnum.DRAW
+        [GameSymbolEnum.PAPER, GameSymbolEnum.ROCK,
+         GameSymbolEnum.SCISSORS]                                   | GameMultiPlayerResultEnum.DRAW
+        [GameSymbolEnum.PAPER, GameSymbolEnum.ROCK,
+         GameSymbolEnum.SCISSORS, GameSymbolEnum.SCISSORS]          | GameMultiPlayerResultEnum.WIN
+        [GameSymbolEnum.PAPER, GameSymbolEnum.ROCK,
+         GameSymbolEnum.SCISSORS, GameSymbolEnum.SCISSORS]          | GameMultiPlayerResultEnum.WIN
+
+    }
+
+
 }

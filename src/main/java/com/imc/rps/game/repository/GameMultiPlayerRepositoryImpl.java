@@ -2,7 +2,7 @@ package com.imc.rps.game.repository;
 
 import com.google.common.base.Strings;
 import com.imc.rps.common.service.CounterService;
-import com.imc.rps.game.model.Game;
+import com.imc.rps.game.model.GameMultiPlayer;
 import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,42 +17,44 @@ import org.springframework.stereotype.Repository;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.imc.rps.common.utils.ClassUtils.GAMES_COLLECTION_NAME;
+import static com.imc.rps.common.utils.ClassUtils.GAME_MULTIPLAYERS_COLLECTION_NAME;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 /**
- * Repository implementation class methods to manipulate {@link Game} resource in database.
+ * Repository implementation class methods to manipulate {@link GameMultiPlayer} resource in database.
  * This class inherits from {@link GameRepositoryCustom}
  *
  * @see GameRepositoryCustom
  */
 @Repository
-public class GameRepositoryImpl implements GameRepositoryCustom<Game> {
+public class GameMultiPlayerRepositoryImpl implements GameRepositoryCustom<GameMultiPlayer> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GameRepositoryImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GameMultiPlayerRepositoryImpl.class);
 
-    private MongoTemplate mongoTemplate;
 
-    private CounterService counterService;
+    protected MongoTemplate mongoTemplate;
+
+    protected CounterService counterService;
+
 
     @Autowired
-    public GameRepositoryImpl(MongoTemplate mongoTemplate, CounterService counterService) {
+    public GameMultiPlayerRepositoryImpl(MongoTemplate mongoTemplate, CounterService counterService) {
         this.mongoTemplate = mongoTemplate;
         this.counterService = counterService;
     }
 
     @Override
-    public List<Game> findByUuid(String uuid) {
+    public List<GameMultiPlayer> findByUuid(String uuid) {
 
         Query query = new Query(new Criteria().where("uuid").is(uuid));
         query.with(new Sort(Sort.Direction.DESC, "date"));
 
-        return mongoTemplate.find(query, Game.class);
+        return mongoTemplate.find(query, GameMultiPlayer.class);
 
     }
 
     @Override
-    public void saveOrUpdate(Game... games) {
+    public void saveOrUpdate(GameMultiPlayer... games) {
 
         Arrays.asList(games).stream().forEach(game -> {
             Criteria criteria = getCriteria(game);
@@ -63,12 +65,13 @@ public class GameRepositoryImpl implements GameRepositoryCustom<Game> {
 
             try {
                 // add an identifier only for new entry
-                if (!mongoTemplate.exists(query, Game.class)) {
-                    update.set("id", new Integer(counterService.getNextSequence(GAMES_COLLECTION_NAME)).toString());
+                if (!mongoTemplate.exists(query, GameMultiPlayer.class)) {
+                    update.set("id",
+                            new Integer(counterService.getNextSequence(GAME_MULTIPLAYERS_COLLECTION_NAME)).toString());
                 }
 
                 // insert or update game
-                mongoTemplate.upsert(query, update, Game.class);
+                mongoTemplate.upsert(query, update, GameMultiPlayer.class);
             } catch (MongoException me) {
                 LOG.error("An error occurred while upserting game[{},{}] ",
                         game.getId(), game.getDate(), me);
@@ -77,16 +80,15 @@ public class GameRepositoryImpl implements GameRepositoryCustom<Game> {
 
     }
 
-    private Update getUpdate(Game game) {
+    private Update getUpdate(GameMultiPlayer game) {
         return new Update()
-                .set("player", game.getPlayer())
-                .set("computer", game.getComputer())
+                .set("players", game.getPlayers())
                 .set("date", game.getDate())
                 .set("result", game.getResult())
                 .set("uuid", game.getUuid());
     }
 
-    private Criteria getCriteria(Game game) {
+    private Criteria getCriteria(GameMultiPlayer game) {
 
         Criteria criteria;
 
@@ -95,8 +97,7 @@ public class GameRepositoryImpl implements GameRepositoryCustom<Game> {
         } else {
             criteria = new Criteria()
                     .andOperator(
-                            where("player").is(game.getPlayer()),
-                            where("computer").is(game.getComputer()),
+                            where("players").is(game.getPlayers()),
                             where("uuid").is(game.getUuid()),
                             where("date").is(game.getDate()),
                             where("result").is(game.getResult()));
@@ -104,6 +105,7 @@ public class GameRepositoryImpl implements GameRepositoryCustom<Game> {
 
         return criteria;
     }
+
 
     @Override
     public MongoTemplate getMongoTemplate() {

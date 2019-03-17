@@ -3,11 +3,14 @@ var app = angular.module('rockPaperScissors',['ui.router','ngStorage','ui.bootst
 
 app.constant('urls', {
     BASE: 'http://localhost:8080/',
-    GAME_SERVICE_API : 'http://localhost:8080/rock-paper-scissors/play'
+    GAME_SERVICE_API : 'http://localhost:8080/rock-paper-scissors/play',
+    GAME_MULTIPLAYER_SERVICE_API : 'http://localhost:8080/rock-paper-scissors/multiplayer'
 });
 
 app.config(['$stateProvider', '$urlRouterProvider',
     function($stateProvider, $urlRouterProvider) {
+
+        $urlRouterProvider.otherwise('/');
 
         $stateProvider
             .state('home', {
@@ -16,5 +19,14 @@ app.config(['$stateProvider', '$urlRouterProvider',
                 controller:'GameController',
                 controllerAs:'ctrl'
             });
-        $urlRouterProvider.otherwise('/');
+
+        $stateProvider
+            .state('multiplayer', {
+                url: '/multiplayer',
+                templateUrl: 'templates/list-multiplayer.html',
+                controller:'GameMultiPlayerController',
+                controllerAs:'ctrl'
+            });
+
+
     }]);

@@ -1,8 +1,25 @@
 package com.imc.rps.game.service;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
+import com.imc.rps.game.model.GameMultiPlayerResultEnum;
 import com.imc.rps.game.model.GameResultEnum;
 import com.imc.rps.game.model.GameSymbolEnum;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.Tuple3;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Service class implementing logic to determine the game result from the player and computer input symbols.
@@ -43,6 +60,130 @@ public class GameResultServiceImpl implements GameResultService {
         }
 
         return result;
+    }
+
+    @Override
+    public GameMultiPlayerResultEnum computeResult(List<GameSymbolEnum> players) {
+
+        if (CollectionUtils.size(players) == 1) {
+            return GameMultiPlayerResultEnum.WIN.setPlayerWinners(Lists.newArrayList(1));
+        }
+
+        if (CollectionUtils.size(players) == 2) {
+            return GameMultiPlayerResultEnum.valueOf(computeResult(players.get(0), players.get(1)));
+        }
+
+        Map<GameSymbolEnum, List<GameSymbolEnum>> symbolsPerTypeList = players.stream()
+                .collect(groupingBy(gameSymbolEnum -> gameSymbolEnum));
+
+        ListMultimap<GameSymbolEnum, Integer> playerIndexesPerSymbol = getPlayerIndexesPerSymbol(players);
+
+
+        return tryGetMultiPlayerResult(GameSymbolEnum.PAPER, symbolsPerTypeList, playerIndexesPerSymbol)
+
+                .orElseGet(() -> tryGetMultiPlayerResult(GameSymbolEnum.SCISSORS, symbolsPerTypeList, playerIndexesPerSymbol)
+
+                        .orElseGet(() -> tryGetMultiPlayerResult(GameSymbolEnum.ROCK, symbolsPerTypeList, playerIndexesPerSymbol)
+
+                                .orElse(GameMultiPlayerResultEnum.DRAW)));
+
+    }
+
+    /**
+     * Returns a {@code MultiMap} of player indexes per symbol.
+     *
+     * @param players Player list
+     * @return MultiMap of player indexes per symbol
+     */
+    private ListMultimap<GameSymbolEnum, Integer> getPlayerIndexesPerSymbol(List<GameSymbolEnum> players) {
+        // MultiMap storing the list of player numbers by game symbol
+        ListMultimap<GameSymbolEnum, Integer> multimap = ArrayListMultimap.create();
+
+        IntStream.range(0, players.size())
+                .forEach(idx ->
+                        multimap.put(players.get(idx), idx)
+                );
+        return multimap;
+    }
+
+    private Optional<GameMultiPlayerResultEnum> tryGetMultiPlayerResult(
+            GameSymbolEnum gameSymbolEnum,
+            Map<GameSymbolEnum, List<GameSymbolEnum>> symbolsPerTypeList,
+            ListMultimap<GameSymbolEnum, Integer> playerIndexesPerSymbol) {
+
+        List playerWinnerNums = Lists.newArrayList();
+
+        Tuple3<Integer, Integer, Integer> totalNumberPerSymbol = countTotalNumberPerSymbol(symbolsPerTypeList, gameSymbolEnum);
+
+        List<GameSymbolEnum> otherSymbols = getOtherSymbolList(gameSymbolEnum);
+
+        // players with the greatest symbol in total, are eliminated
+        if (totalNumberPerSymbol._1 > totalNumberPerSymbol._2
+                && totalNumberPerSymbol._1 > totalNumberPerSymbol._3) {
+
+            Optional<Tuple2<GameSymbolEnum, GameSymbolEnum>> onlyTwoPlayer = checkIfOnlyTwoPlayersLeft(gameSymbolEnum, symbolsPerTypeList);
+
+            // when only two players left default to the rule engine with two players
+            if (onlyTwoPlayer.isPresent()) {
+                return Optional.of(GameMultiPlayerResultEnum
+                        .valueOf(computeResult(onlyTwoPlayer.get()._1, onlyTwoPlayer.get()._2)));
+            }
+
+            if (totalNumberPerSymbol._2 == totalNumberPerSymbol._3) {
+                return Optional.of(GameMultiPlayerResultEnum.DRAW);
+            }
+
+            playerWinnerNums = totalNumberPerSymbol._2 >= totalNumberPerSymbol._3 ?
+                    playerIndexesPerSymbol.get(otherSymbols.get(0))
+                    : playerIndexesPerSymbol.get(otherSymbols.get(1));
+
+        }
+
+        return !CollectionUtils.isEmpty(playerWinnerNums) ?
+                Optional.ofNullable(GameMultiPlayerResultEnum.WIN.setPlayerWinners(playerWinnerNums))
+                : Optional.empty();
+
+    }
+
+    /**
+     * Counts total number of each symbol.
+     *
+     * @param symbolsPerTypeList
+     * @param gameSymbolEnum
+     * @return
+     */
+    private Tuple3<Integer, Integer, Integer> countTotalNumberPerSymbol(
+            Map<GameSymbolEnum, List<GameSymbolEnum>> symbolsPerTypeList, GameSymbolEnum gameSymbolEnum) {
+
+        List<GameSymbolEnum> otherSymbols = getOtherSymbolList(gameSymbolEnum);
+
+        // count total number of each symbol
+        Optional<List> totalSymbol1 = Optional.ofNullable(symbolsPerTypeList.get(gameSymbolEnum));
+        Optional<List> totalSymbol2 = Optional.ofNullable(symbolsPerTypeList.get(otherSymbols.get(0)));
+        Optional<List> totalSymbol3 = Optional.ofNullable(symbolsPerTypeList.get(otherSymbols.get(1)));
+
+        return Tuple.of(totalSymbol1.isPresent() ? totalSymbol1.get().size() : 0,
+                totalSymbol2.isPresent() ? totalSymbol2.get().size() : 0,
+                totalSymbol3.isPresent() ? totalSymbol3.get().size() : 0);
+    }
+
+    private List<GameSymbolEnum> getOtherSymbolList(GameSymbolEnum gameSymbolEnum) {
+        return Arrays.stream(GameSymbolEnum.values())
+                .filter(gameSymbol -> gameSymbol != gameSymbolEnum)
+                .collect(Collectors.toList());
+    }
+
+    private Optional<Tuple2<GameSymbolEnum, GameSymbolEnum>> checkIfOnlyTwoPlayersLeft(GameSymbolEnum gameSymbolEnum, Map<GameSymbolEnum, List<GameSymbolEnum>> symbolsPerTypeList) {
+        List<GameSymbolEnum> subSymbolList = symbolsPerTypeList
+                .values()
+                .stream()
+                .flatMap(gameSymbolEna -> gameSymbolEna.stream())
+                .filter(gameSymbolEna -> !symbolsPerTypeList.get(gameSymbolEnum).contains(gameSymbolEna))
+                .collect(Collectors.toList());
+
+        return CollectionUtils.size(subSymbolList) == 2 ?
+                Optional.ofNullable(Tuple.of(subSymbolList.get(0), subSymbolList.get(1))) :
+                Optional.empty();
     }
 
 

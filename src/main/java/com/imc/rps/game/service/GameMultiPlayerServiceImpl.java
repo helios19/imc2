@@ -1,7 +1,8 @@
 package com.imc.rps.game.service;
 
 import com.imc.rps.common.utils.ClassUtils;
-import com.imc.rps.game.model.Game;
+import com.imc.rps.game.model.GameMultiPlayer;
+import com.imc.rps.game.repository.GameMultiPlayerRepository;
 import com.imc.rps.game.repository.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -15,18 +16,18 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Service class providing CRUD operations and caching logic for {@link Game} resource.
+ * Service class providing CRUD operations and caching logic for {@link GameMultiPlayer} resource.
  *
  * @see GameRepository
  */
 @Service
-@CacheConfig(cacheNames = ClassUtils.GAMES_COLLECTION_NAME)
-public class GameServiceImpl implements GameService<Game, GameRepository> {
+@CacheConfig(cacheNames = ClassUtils.GAME_MULTIPLAYERS_COLLECTION_NAME)
+public class GameMultiPlayerServiceImpl implements GameService<GameMultiPlayer, GameMultiPlayerRepository> {
 
-    private GameRepository repository;
+    private GameMultiPlayerRepository repository;
 
     @Autowired
-    public GameServiceImpl(GameRepository repository) {
+    public GameMultiPlayerServiceImpl(GameMultiPlayerRepository repository) {
         this.repository = repository;
     }
 
@@ -35,7 +36,7 @@ public class GameServiceImpl implements GameService<Game, GameRepository> {
      */
     @Override
     @CacheEvict(allEntries = true)
-    public void save(Game game) {
+    public void save(GameMultiPlayer game) {
         repository.saveOrUpdate(game);
     }
 
@@ -44,7 +45,7 @@ public class GameServiceImpl implements GameService<Game, GameRepository> {
      */
     @Override
     @Cacheable
-    public Optional<Game> findById(String id) {
+    public Optional<GameMultiPlayer> findById(String id) {
         return repository.findById(id);
     }
 
@@ -53,7 +54,7 @@ public class GameServiceImpl implements GameService<Game, GameRepository> {
      */
     @Override
     @Cacheable
-    public List<Game> findByUuid(String uuid) {
+    public List<GameMultiPlayer> findByUuid(String uuid) {
         return repository.findByUuid(uuid);
     }
 
@@ -62,7 +63,7 @@ public class GameServiceImpl implements GameService<Game, GameRepository> {
      */
     @Override
     @Cacheable
-    public List<Game> findAll() {
+    public List<GameMultiPlayer> findAll() {
         return repository.findAll();
     }
 
@@ -71,17 +72,17 @@ public class GameServiceImpl implements GameService<Game, GameRepository> {
      */
     @Override
     @Cacheable
-    public List<Game> findAll(Pageable pageable) {
-        Page<Game> games = repository.findAll(pageable);
+    public List<GameMultiPlayer> findAll(Pageable pageable) {
+        Page<GameMultiPlayer> games = repository.findAll(pageable);
         return games.getContent();
     }
 
     /**
      * Sets an {@link GameRepository} instance.
      *
-     * @param repository Game repository instance
+     * @param repository GameMultiPlayer repository instance
      */
-    public void setRepository(GameRepository repository) {
+    public void setRepository(GameMultiPlayerRepository repository) {
         this.repository = repository;
     }
 }

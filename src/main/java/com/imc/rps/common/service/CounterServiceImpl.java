@@ -33,7 +33,8 @@ public class CounterServiceImpl implements CounterService {
      */
     public int getNextSequence(String collectionName) {
 
-        if (!mongo.collectionExists(ClassUtils.COUNTERS_COLLECTION_NAME)) {
+        if (!mongo.collectionExists(ClassUtils.COUNTERS_COLLECTION_NAME)
+                || !mongo.exists(query(where("_id").is(collectionName)), Counter.class)) {
             //db.Counter.insert({ 'name' : 'user_id', sequence : 1}
             mongo.insert(Counter.builder().id(collectionName).seq(0).build(), ClassUtils.COUNTERS_COLLECTION_NAME);
         }

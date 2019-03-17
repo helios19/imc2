@@ -74,6 +74,9 @@ __Rock Paper Scissors main page__
 __Rock Paper Scissors list page__
 ![Rock Paper Scissors list page](img/rps-list-page.png)
 
+__Multiplayer Rock Paper Scissors list page__
+![Multiplayer Rock Paper Scissors list page](img/rps-multiplayer-list-page.png)
+
 
 Requirement assumptions
 --
@@ -88,6 +91,12 @@ considered while implementing the solution:
     - Vulnerability of the system through common XSS attacks
     - Performance and scalability of the system
     - Testability of the system from the start through BDD
+
+**MultiPlayer**
+For the multiplayer option note that the following rules have been implemented:
+```
+If you want to play Rock Paper Scissors with a group of more than 2 people it is very simple, everyone in the group plays a gesture and if all 3 gestures are showing everyone plays again. If only 2 gestures are showing the players showing the greater gesture leave the circle the other stay. This continues until the traditional game or there is only 1.
+```
 
 Design and architecture decisions
 --

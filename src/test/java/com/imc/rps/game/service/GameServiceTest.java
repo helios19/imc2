@@ -5,6 +5,7 @@ import com.imc.rps.common.utils.ClassUtils;
 import com.imc.rps.game.model.Game;
 import com.imc.rps.game.model.GameResultEnum;
 import com.imc.rps.game.model.GameSymbolEnum;
+import com.imc.rps.game.repository.GameMultiPlayerRepository;
 import com.imc.rps.game.repository.GameRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class GameServiceTest {
 
     @Mock
     private GameRepository repository;
-
+    
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
@@ -99,6 +100,12 @@ public class GameServiceTest {
         public GameRepository gameRepository() {
             return null;
         }
+
+        @Bean
+        public GameMultiPlayerRepository gameMultiPlayerRepository() {
+            return null;
+        }
+
     }
 }
 

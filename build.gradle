@@ -14,6 +14,7 @@ buildscript {
     ext['lombokVersion'] = '1.16.20'
     ext['modelMapperVersion'] = '1.1.0'
     ext['owaspVersion'] = '2.0.1'
+    ext['vavrVersion'] = '0.9.0'
 
     repositories {
         jcenter()
@@ -88,6 +89,9 @@ dependencies {
 
     // guava
     compile "com.google.guava:guava:${guavaVersion}"
+
+    // vavr
+    compile "io.vavr:vavr:${vavrVersion}"
 
     // logging
     compile "org.slf4j:slf4j-api:${slf4jVersion}"

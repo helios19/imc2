@@ -1,0 +1,12 @@
+<div class="row">
+    <div class="form-group col-md-12">
+        <label class="col-md-2 control-lable" for="player{{$index+3}}">Player {{$index+3}}</label>
+        <div class="col-md-7">
+            <select ng-model="ctrl.game.playerSymbols[$index+2]" id="player{{$index+3}}" class="gamename form-control input-sm" required >
+                <option selected value="ROCK">ROCK</option>
+                <option value="PAPER">PAPER</option>
+                <option value="SCISSORS">SCISSORS</option>
+            </select>
+        </div>
+    </div>
+</div>

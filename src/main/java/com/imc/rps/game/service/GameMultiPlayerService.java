@@ -1,6 +1,7 @@
 package com.imc.rps.game.service;
 
 import com.imc.rps.game.model.Game;
+import com.imc.rps.game.model.GameMultiPlayer;
 import com.imc.rps.game.repository.GameRepository;
 import org.springframework.data.domain.Pageable;
 
@@ -10,16 +11,16 @@ import java.util.Optional;
 /**
  * Service interface providing method declarations for CRUD operations for the {@link Game} resource.
  *
- * @see Game
+ * @see GameMultiPlayer
  * @see GameServiceImpl
  */
-public interface GameService<T, U> {
+public interface GameMultiPlayerService {
     /**
      * Saves an {@link Optional<Game>} instance.
      *
-     * @param game Game object to save
+     * @param game GameMultiPlayer object to save
      */
-    void save(T game);
+    void save(GameMultiPlayer game);
 
     /**
      * Returns an {@link Optional<Game>} instance given {@code id} argument.
@@ -27,22 +28,22 @@ public interface GameService<T, U> {
      * @param id Game's identifier
      * @return Optional game
      */
-    Optional<T> findById(String id);
+    Optional<Game> findById(String id);
 
     /**
      * Return a list of {@link Game} given {@code uuid} argument.
      *
-     * @param uuid Game uuid
+     * @param uuid GameMultiPlayer uuid
      * @return List of game history found for a given uuid
      */
-    List<T> findByUuid(String uuid);
+    List<Game> findByUuid(String uuid);
 
     /**
      * Returns a list of all {@link Game}.
      *
      * @return List of games found
      */
-    List<T> findAll();
+    List<Game> findAll();
 
     /**
      * Return a list of {@link Game} given {@link Pageable} argument.
@@ -50,12 +51,12 @@ public interface GameService<T, U> {
      * @param pageable Pageable argument
      * @return List of games found
      */
-    List<T> findAll(Pageable pageable);
+    List<Game> findAll(Pageable pageable);
 
     /**
      * Sets a {@link GameRepository} instance.
      *
-     * @param repository Game repository instance
+     * @param repository GameMultiPlayer repository instance
      */
-    void setRepository(U repository);
+    void setRepository(GameRepository repository);
 }

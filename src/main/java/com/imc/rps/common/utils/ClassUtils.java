@@ -4,7 +4,9 @@ import com.google.common.base.Enums;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.imc.rps.game.dto.GameDto;
+import com.imc.rps.game.dto.GameMultiPlayerDto;
 import com.imc.rps.game.model.Game;
+import com.imc.rps.game.model.GameMultiPlayer;
 import com.imc.rps.game.model.GameSymbolEnum;
 import org.modelmapper.ModelMapper;
 
@@ -25,6 +27,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 public class ClassUtils {
     public static final String COUNTERS_COLLECTION_NAME = "counters";
     public static final String GAMES_COLLECTION_NAME = "games";
+    public static final String GAME_MULTIPLAYERS_COLLECTION_NAME = "gameMultiPlayers";
     public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
     public static final DateTimeFormatter FORMATTER = ofPattern("d/MM/yyyy h:mm:ss a");
     public static final int DEFAULT_PAGE_SIZE = 50;
@@ -41,6 +44,16 @@ public class ClassUtils {
      */
     public static boolean isValidateSymbol(String symbol) {
         return Enums.getIfPresent(GameSymbolEnum.class, symbol).isPresent();
+    }
+
+    /**
+     * Validates game symbol.
+     *
+     * @param symbols to validate
+     * @return Whether the symbols are valid
+     */
+    public static boolean isInvalidateSymbols(List<String> symbols) {
+        return symbols.stream().filter(s -> !isValidateSymbol(s)).findAny().isPresent();
     }
 
     /**
@@ -89,6 +102,18 @@ public class ClassUtils {
     }
 
     /**
+     * Converts a {@link Game} instance into a {@link GameDto} object.
+     *
+     * @param game Game to convert
+     * @return GameDto
+     */
+    public static GameMultiPlayerDto convertToDto(GameMultiPlayer game) {
+        GameMultiPlayerDto gameDto = MODEL_MAPPER.map(game, GameMultiPlayerDto.class);
+        gameDto.setDate(fromDate(game.getDate()));
+        return gameDto;
+    }
+
+    /**
      * Returns a new UUID if {@code gameUUID} input parameter is null or empty.
      *
      * @param gameUUID Game UUID
@@ -121,4 +146,15 @@ public class ClassUtils {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Converts a list of multiplayer games to its Dto representation.
+     *
+     * @param games List of multiplayer games to convert
+     * @return List of GameDtos
+     */
+    public static List<GameMultiPlayerDto> convertToGameMultiPlayerDtos(List<GameMultiPlayer> games) {
+        return games.stream()
+                .map(game -> ClassUtils.convertToDto(game))
+                .collect(Collectors.toList());
+    }
 }
