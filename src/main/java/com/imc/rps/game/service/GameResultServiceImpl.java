@@ -3,7 +3,6 @@ package com.imc.rps.game.service;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
-import com.imc.rps.game.model.GameMultiPlayerResultEnum;
 import com.imc.rps.game.model.GameResultEnum;
 import com.imc.rps.game.model.GameSymbolEnum;
 import io.vavr.Tuple;
@@ -63,14 +62,14 @@ public class GameResultServiceImpl implements GameResultService {
     }
 
     @Override
-    public GameMultiPlayerResultEnum computeResult(List<GameSymbolEnum> players) {
+    public GameResultEnum computeResult(List<GameSymbolEnum> players) {
 
         if (CollectionUtils.size(players) == 1) {
-            return GameMultiPlayerResultEnum.WIN.setPlayerWinners(Lists.newArrayList(1));
+            return GameResultEnum.WIN.setPlayerWinners(Lists.newArrayList(1));
         }
 
         if (CollectionUtils.size(players) == 2) {
-            return GameMultiPlayerResultEnum.valueOf(computeResult(players.get(0), players.get(1)));
+            return computeResult(players.get(0), players.get(1));
         }
 
         Map<GameSymbolEnum, List<GameSymbolEnum>> symbolsPerTypeList = players.stream()
@@ -85,7 +84,7 @@ public class GameResultServiceImpl implements GameResultService {
 
                         .orElseGet(() -> tryGetMultiPlayerResult(GameSymbolEnum.ROCK, symbolsPerTypeList, playerIndexesPerSymbol)
 
-                                .orElse(GameMultiPlayerResultEnum.DRAW)));
+                                .orElse(GameResultEnum.DRAW)));
 
     }
 
@@ -106,7 +105,7 @@ public class GameResultServiceImpl implements GameResultService {
         return multimap;
     }
 
-    private Optional<GameMultiPlayerResultEnum> tryGetMultiPlayerResult(
+    private Optional<GameResultEnum> tryGetMultiPlayerResult(
             GameSymbolEnum gameSymbolEnum,
             Map<GameSymbolEnum, List<GameSymbolEnum>> symbolsPerTypeList,
             ListMultimap<GameSymbolEnum, Integer> playerIndexesPerSymbol) {
@@ -125,12 +124,11 @@ public class GameResultServiceImpl implements GameResultService {
 
             // when only two players left default to the rule engine with two players
             if (onlyTwoPlayer.isPresent()) {
-                return Optional.of(GameMultiPlayerResultEnum
-                        .valueOf(computeResult(onlyTwoPlayer.get()._1, onlyTwoPlayer.get()._2)));
+                return Optional.of(computeResult(onlyTwoPlayer.get()._1, onlyTwoPlayer.get()._2));
             }
 
             if (totalNumberPerSymbol._2 == totalNumberPerSymbol._3) {
-                return Optional.of(GameMultiPlayerResultEnum.DRAW);
+                return Optional.of(GameResultEnum.DRAW);
             }
 
             playerWinnerNums = totalNumberPerSymbol._2 >= totalNumberPerSymbol._3 ?
@@ -140,7 +138,7 @@ public class GameResultServiceImpl implements GameResultService {
         }
 
         return !CollectionUtils.isEmpty(playerWinnerNums) ?
-                Optional.ofNullable(GameMultiPlayerResultEnum.WIN.setPlayerWinners(playerWinnerNums))
+                Optional.ofNullable(GameResultEnum.WIN.setPlayerWinners(playerWinnerNums))
                 : Optional.empty();
 
     }
@@ -189,19 +187,25 @@ public class GameResultServiceImpl implements GameResultService {
 
     private GameResultEnum playerHasPaper(GameSymbolEnum computer) {
 
-        return computer == GameSymbolEnum.SCISSORS ? GameResultEnum.LOSE : GameResultEnum.WIN;
+        return computer == GameSymbolEnum.SCISSORS ?
+                GameResultEnum.WIN.setPlayerWinners(Lists.newArrayList(2))
+                : GameResultEnum.WIN.setPlayerWinners(Lists.newArrayList(1));
 
     }
 
     private GameResultEnum playerHasRock(GameSymbolEnum computer) {
 
-        return computer == GameSymbolEnum.PAPER ? GameResultEnum.LOSE : GameResultEnum.WIN;
+        return computer == GameSymbolEnum.PAPER ?
+                GameResultEnum.WIN.setPlayerWinners(Lists.newArrayList(2))
+                : GameResultEnum.WIN.setPlayerWinners(Lists.newArrayList(1));
 
     }
 
     private GameResultEnum playerHasScissors(GameSymbolEnum computer) {
 
-        return computer == GameSymbolEnum.ROCK ? GameResultEnum.LOSE : GameResultEnum.WIN;
+        return computer == GameSymbolEnum.ROCK ?
+                GameResultEnum.WIN.setPlayerWinners(Lists.newArrayList(2))
+                : GameResultEnum.WIN.setPlayerWinners(Lists.newArrayList(1));
 
     }
 }

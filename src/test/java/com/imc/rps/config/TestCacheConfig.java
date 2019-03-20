@@ -16,6 +16,6 @@ import org.springframework.context.annotation.Configuration;
 public class TestCacheConfig {
     @Bean
     CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager(ClassUtils.GAMES_COLLECTION_NAME, ClassUtils.GAME_MULTIPLAYERS_COLLECTION_NAME);
+        return new ConcurrentMapCacheManager(ClassUtils.GAMES_COLLECTION_NAME);
     }
 }

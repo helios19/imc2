@@ -21,7 +21,7 @@ import java.util.Optional;
  */
 @Service
 @CacheConfig(cacheNames = ClassUtils.GAMES_COLLECTION_NAME)
-public class GameServiceImpl implements GameService<Game, GameRepository> {
+public class GameServiceImpl implements GameService {
 
     private GameRepository repository;
 

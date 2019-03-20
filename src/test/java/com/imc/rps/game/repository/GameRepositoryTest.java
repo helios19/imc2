@@ -1,9 +1,8 @@
 package com.imc.rps.game.repository;
 
+import com.google.common.collect.Lists;
 import com.imc.rps.common.utils.ClassUtils;
-import com.imc.rps.game.model.Game;
-import com.imc.rps.game.model.GameResultEnum;
-import com.imc.rps.game.model.GameSymbolEnum;
+import com.imc.rps.game.model.*;
 import com.mongodb.MongoClient;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import org.junit.After;
@@ -25,7 +24,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 @ActiveProfiles({"test", "cacheDisabled"})
 @SpringApplicationConfiguration(classes = GameRepositoryTest.TestAppConfig.class,
@@ -51,9 +52,8 @@ public class GameRepositoryTest {
 
     private Game sampleGame = Game
             .builder()
-            .player(GameSymbolEnum.SCISSORS.name())
-            .computer(GameSymbolEnum.PAPER.name())
-            .result(GameResultEnum.WIN.name())
+            .players(Lists.newArrayList(GameSymbolEnum.SCISSORS.name(),GameSymbolEnum.PAPER.name()))
+            .result("players 1 - " + GameResultEnum.WIN.name())
             .uuid(GAME_UUID)
             .date(ClassUtils.toDate("1/10/2016 2:51:23 AM"))
             .build();
@@ -91,11 +91,10 @@ public class GameRepositoryTest {
         // then
         assertFalse(games.isEmpty());
         assertNotNull(games.get(0));
-        assertEquals(GameSymbolEnum.SCISSORS.name(), games.get(0).getPlayer());
-        assertEquals(GameSymbolEnum.PAPER.name(), games.get(0).getComputer());
+        assertEquals(Lists.newArrayList(GameSymbolEnum.SCISSORS.name(), GameSymbolEnum.PAPER.name()), games.get(0).getPlayers());
         assertEquals(GAME_UUID, games.get(0).getUuid());
         assertEquals(ClassUtils.toDate("1/10/2016 2:51:23 AM"), games.get(0).getDate());
-        assertEquals(GameResultEnum.WIN.name(), games.get(0).getResult());
+        assertEquals("players 1 - " + GameResultEnum.WIN.name(), games.get(0).getResult());
     }
 
     @Configuration

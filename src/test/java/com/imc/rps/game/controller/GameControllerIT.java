@@ -4,10 +4,8 @@ import com.google.common.collect.Lists;
 import com.imc.rps.Application;
 import com.imc.rps.common.utils.ClassUtils;
 import com.imc.rps.game.model.Game;
-import com.imc.rps.game.model.GameMultiPlayer;
 import com.imc.rps.game.model.GameResultEnum;
 import com.imc.rps.game.model.GameSymbolEnum;
-import com.imc.rps.game.repository.GameMultiPlayerRepository;
 import com.imc.rps.game.repository.GameRepository;
 import com.mongodb.MongoClient;
 import de.flapdoodle.embed.mongo.MongodExecutable;
@@ -27,11 +25,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -55,9 +51,6 @@ public class GameControllerIT {
     private GameRepository gameRepository;
 
     @Autowired
-    private GameMultiPlayerRepository gameMultiPlayerRepository;
-
-    @Autowired
     private WebApplicationContext webApplicationContext;
 
     @Autowired
@@ -73,18 +66,9 @@ public class GameControllerIT {
 
     private Game sampleGame = Game
             .builder()
-            .player(GameSymbolEnum.SCISSORS.name())
-            .computer(GameSymbolEnum.PAPER.name())
-            .result(GameResultEnum.WIN.name())
+            .players(Lists.newArrayList(GameSymbolEnum.SCISSORS.name(), GameSymbolEnum.PAPER.name()))
+            .result("players 1 - " + GameResultEnum.WIN.name())
             .uuid(GAME_UUID)
-            .date(ClassUtils.toDate("1/10/2016 2:51:23 AM"))
-            .build();
-
-    private GameMultiPlayer sampleGameMultiPlayer = GameMultiPlayer
-            .builder()
-            .players(Lists.newArrayList(GameSymbolEnum.SCISSORS.name(), GameSymbolEnum.PAPER.name(), GameSymbolEnum.ROCK.name()))
-            .result(GameResultEnum.WIN.name())
-            .uuid(GAME_MULTIPLAYER_UUID)
             .date(ClassUtils.toDate("1/10/2016 2:51:23 AM"))
             .build();
 
@@ -99,17 +83,14 @@ public class GameControllerIT {
 
         // add game sample to db
         gameRepository.saveOrUpdate(sampleGame);
-        gameMultiPlayerRepository.saveOrUpdate(sampleGameMultiPlayer);
     }
 
     @After
     public void tearDown() throws Exception {
         // reset game collection
         gameRepository.getMongoTemplate().dropCollection(Game.class);
-        gameMultiPlayerRepository.getMongoTemplate().dropCollection(GameMultiPlayer.class);
         // reset sequence collection
         gameRepository.getMongoTemplate().dropCollection(ClassUtils.COUNTERS_COLLECTION_NAME);
-        gameMultiPlayerRepository.getMongoTemplate().dropCollection(ClassUtils.COUNTERS_COLLECTION_NAME);
     }
 
     @AfterClass
@@ -119,51 +100,34 @@ public class GameControllerIT {
         staticMongodExec.stop();
     }
 
-
     @Test
     public void shouldReturnGameSummary() throws Exception {
-        mockMvc.perform(get("/rock-paper-scissors/play/" + GameSymbolEnum.SCISSORS.name() + "/" + GAME_UUID))
+        mockMvc.perform(get("/rock-paper-scissors/play/" + GAME_UUID + "?computerGenerated=true&playerSymbol=" + GameSymbolEnum.SCISSORS.name()))
                 .andDo(print())
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.playerSymbol", is(GameSymbolEnum.SCISSORS.name())))
-                .andExpect(jsonPath("$.computerSymbol", notNullValue()))
+                .andExpect(jsonPath("$.playerSymbols", hasItems(GameSymbolEnum.SCISSORS.name())))
                 .andExpect(jsonPath("$.result", notNullValue()))
                 .andExpect(jsonPath("$.uuid", is(GAME_UUID)))
                 .andExpect(jsonPath("$.history", notNullValue()));
     }
 
-
     @Test
     public void shouldThrowExceptionWhenPlaySymbolIsInvalid() throws Exception {
         String unknownPlayerSymbol = "unknown-player-symbol";
 
-        mockMvc.perform(get("/rock-paper-scissors/play/" + unknownPlayerSymbol + "/" + GAME_UUID))
+        mockMvc.perform(get("/rock-paper-scissors/play/" + GAME_UUID + "?playerSymbol=" + unknownPlayerSymbol))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$[0].logref", is("error")))
-                .andExpect(jsonPath("$[0].message", is("Invalid parameter value [param:playerSymbol, value:" + unknownPlayerSymbol + "]")));
-    }
-
-
-    @Test
-    public void shouldReturnGameMultiPlayerSummary() throws Exception {
-        mockMvc.perform(get("/rock-paper-scissors/multiplayer/" + GAME_UUID + "?playerSymbol=" + GameSymbolEnum.SCISSORS.name()
-                + "&playerSymbol=" + GameSymbolEnum.ROCK.name()
-                + "&playerSymbol=" + GameSymbolEnum.ROCK.name()))
-                .andDo(print())
-                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.playerSymbols", is(Arrays.asList(GameSymbolEnum.SCISSORS.name(), GameSymbolEnum.ROCK.name(), GameSymbolEnum.ROCK.name()))))
-                .andExpect(jsonPath("$.result", is("players 0 - WIN")))
-                .andExpect(jsonPath("$.uuid", notNullValue()))
-                .andExpect(jsonPath("$.history", notNullValue()));
+                .andExpect(jsonPath("$[0].message", is("Invalid parameter value [param:playerSymbols, value:[" + unknownPlayerSymbol + "]]")));
     }
 
     @Test
     public void shouldThrowExceptionWhenPlaySymbolsAreInvalid() throws Exception {
         String unknownPlayerSymbol = "unknown-player-symbol";
 
-        mockMvc.perform(get("/rock-paper-scissors/multiplayer/" + GAME_UUID + "?playerSymbol=" + unknownPlayerSymbol))
+        mockMvc.perform(get("/rock-paper-scissors/play/" + GAME_UUID + "?playerSymbol=" + unknownPlayerSymbol))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(contentType))

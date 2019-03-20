@@ -31,9 +31,11 @@ public class GameRepositoryImpl implements GameRepositoryCustom<Game> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GameRepositoryImpl.class);
 
-    private MongoTemplate mongoTemplate;
 
-    private CounterService counterService;
+    protected MongoTemplate mongoTemplate;
+
+    protected CounterService counterService;
+
 
     @Autowired
     public GameRepositoryImpl(MongoTemplate mongoTemplate, CounterService counterService) {
@@ -64,7 +66,8 @@ public class GameRepositoryImpl implements GameRepositoryCustom<Game> {
             try {
                 // add an identifier only for new entry
                 if (!mongoTemplate.exists(query, Game.class)) {
-                    update.set("id", new Integer(counterService.getNextSequence(GAMES_COLLECTION_NAME)).toString());
+                    update.set("id",
+                            new Integer(counterService.getNextSequence(GAMES_COLLECTION_NAME)).toString());
                 }
 
                 // insert or update game
@@ -79,8 +82,7 @@ public class GameRepositoryImpl implements GameRepositoryCustom<Game> {
 
     private Update getUpdate(Game game) {
         return new Update()
-                .set("player", game.getPlayer())
-                .set("computer", game.getComputer())
+                .set("players", game.getPlayers())
                 .set("date", game.getDate())
                 .set("result", game.getResult())
                 .set("uuid", game.getUuid());
@@ -95,8 +97,7 @@ public class GameRepositoryImpl implements GameRepositoryCustom<Game> {
         } else {
             criteria = new Criteria()
                     .andOperator(
-                            where("player").is(game.getPlayer()),
-                            where("computer").is(game.getComputer()),
+                            where("players").is(game.getPlayers()),
                             where("uuid").is(game.getUuid()),
                             where("date").is(game.getDate()),
                             where("result").is(game.getResult()));
@@ -104,6 +105,7 @@ public class GameRepositoryImpl implements GameRepositoryCustom<Game> {
 
         return criteria;
     }
+
 
     @Override
     public MongoTemplate getMongoTemplate() {

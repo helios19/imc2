@@ -2,9 +2,9 @@ package com.imc.rps.game.handler;
 
 import com.imc.rps.common.handler.GlobalExceptionHandler;
 import com.imc.rps.game.exception.GameNotFoundException;
-import com.imc.rps.game.model.Game;
 import com.imc.rps.game.exception.InvalidGameException;
 import com.imc.rps.game.exception.InvalidParameterException;
+import com.imc.rps.game.model.Game;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;

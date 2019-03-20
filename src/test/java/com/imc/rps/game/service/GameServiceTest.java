@@ -5,7 +5,6 @@ import com.imc.rps.common.utils.ClassUtils;
 import com.imc.rps.game.model.Game;
 import com.imc.rps.game.model.GameResultEnum;
 import com.imc.rps.game.model.GameSymbolEnum;
-import com.imc.rps.game.repository.GameMultiPlayerRepository;
 import com.imc.rps.game.repository.GameRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +24,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -50,12 +51,12 @@ public class GameServiceTest {
 
     private Game sampleGame = Game
             .builder()
-            .player(GameSymbolEnum.SCISSORS.name())
-            .computer(GameSymbolEnum.PAPER.name())
-            .result(GameResultEnum.WIN.name())
+            .players(Lists.newArrayList(GameSymbolEnum.SCISSORS.name(), GameSymbolEnum.PAPER.name()))
+            .result("players 1 - " + GameResultEnum.WIN.name())
             .uuid(GAME_UUID)
             .date(ClassUtils.toDate("1/10/2016 2:51:23 AM"))
             .build();
+
 
     @Test
     @DirtiesContext
@@ -70,11 +71,10 @@ public class GameServiceTest {
         // then
         assertFalse(games.isEmpty());
         assertNotNull(games.get(0));
-        assertEquals(GameSymbolEnum.SCISSORS.name(), games.get(0).getPlayer());
-        assertEquals(GameSymbolEnum.PAPER.name(), games.get(0).getComputer());
+        assertEquals(Lists.newArrayList(GameSymbolEnum.SCISSORS.name(), GameSymbolEnum.PAPER.name()), games.get(0).getPlayers());
         assertEquals(GAME_UUID, games.get(0).getUuid());
         assertEquals(ClassUtils.toDate("1/10/2016 2:51:23 AM"), games.get(0).getDate());
-        assertEquals(GameResultEnum.WIN.name(), games.get(0).getResult());
+        assertEquals("players 1 - " + GameResultEnum.WIN.name(), games.get(0).getResult());
         verify(repository, times(1)).findByUuid(any(String.class));
         verifyNoMoreInteractions(repository);
     }
@@ -98,11 +98,6 @@ public class GameServiceTest {
 
         @Bean
         public GameRepository gameRepository() {
-            return null;
-        }
-
-        @Bean
-        public GameMultiPlayerRepository gameMultiPlayerRepository() {
             return null;
         }
 

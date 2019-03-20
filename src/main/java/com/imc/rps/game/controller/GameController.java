@@ -1,14 +1,14 @@
 package com.imc.rps.game.controller;
 
-import com.imc.rps.game.dto.GameMultiPlayerSummary;
 import com.imc.rps.game.dto.GameSummary;
 import com.imc.rps.game.exception.GameNotFoundException;
 import com.imc.rps.game.exception.InvalidParameterException;
-import com.imc.rps.game.model.*;
-import com.imc.rps.game.repository.GameMultiPlayerRepository;
-import com.imc.rps.game.repository.GameRepository;
-import com.imc.rps.game.service.GameResultService;
+import com.imc.rps.game.model.Game;
+import com.imc.rps.game.model.GameResultEnum;
+import com.imc.rps.game.model.GameSymbolEnum;
 import com.imc.rps.game.service.GameService;
+import com.imc.rps.game.service.GameResultService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,31 +33,28 @@ import static com.imc.rps.common.utils.ClassUtils.*;
 @RequestMapping("/rock-paper-scissors")
 public class GameController {
 
-    private final GameService<Game, GameRepository> gameService;
-
-    private final GameService<GameMultiPlayer, GameMultiPlayerRepository> gameMultiPlayerService;
+    private final GameService gameService;
 
     private final GameResultService gameResultService;
 
     @Autowired
-    public GameController(GameService<Game, GameRepository> gameService,
-                          GameService<GameMultiPlayer, GameMultiPlayerRepository> gameMultiPlayerService,
+    public GameController(GameService gameService,
                           GameResultService gameResultService) {
         this.gameService = gameService;
-        this.gameMultiPlayerService = gameMultiPlayerService;
         this.gameResultService = gameResultService;
     }
 
     /**
-     * Returns the game multiplayer summary result for a given list of {@code playerSymbols} and {@code gameUUID} parameters.
+     * Returns the game summary result for a given list of {@code playerSymbols} and {@code gameUUID} parameters.
      *
      * @param playerSymbols Player symbols
      * @return Game summary result
      * @throws GameNotFoundException if no game for the given playerSymbol and gameUUID can be found
      */
-    @RequestMapping(value = "/multiplayer", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<GameMultiPlayerSummary> getGameMultiplePlayersResult(@RequestParam(value = "playerSymbol") List<String> playerSymbols) {
-        return getGameMultiPlayerSummaryResponse(playerSymbols, null);
+    @RequestMapping(value = "/play", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<GameSummary> getGameMultiplePlayersResult(@RequestParam(value = "playerSymbol") List<String> playerSymbols,
+                                                                    @RequestParam(value = "computerGenerated", required = false) boolean isComputerGenerated) {
+        return getGameSummaryResponse(playerSymbols, null, isComputerGenerated);
     }
 
     /**
@@ -68,96 +65,36 @@ public class GameController {
      * @return Game summary result
      * @throws GameNotFoundException if no game for the given playerSymbol and gameUUID can be found
      */
-    @RequestMapping(value = "/multiplayer/{gameUUID}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<GameMultiPlayerSummary> getGameMultiplePlayersResult(@RequestParam(value = "playerSymbol") List<String> playerSymbols,
-                                                                               @PathVariable("gameUUID") String gameUUID) {
-        return getGameMultiPlayerSummaryResponse(playerSymbols, gameUUID);
-    }
-
-    /**
-     * Generates game multiplayer summary response object.
-     *
-     * @param playerSymbols Player symbols
-     * @param gameUUID      Game UUID
-     * @return Game summary result
-     * @throws GameNotFoundException if no game for the given playerSymbol and gameUUID can be found
-     */
-    private ResponseEntity<GameMultiPlayerSummary> getGameMultiPlayerSummaryResponse(
-            @RequestParam(value = "playerSymbol") List<String> playerSymbols, @PathVariable("gameUUID") String gameUUID) {
-
-        if (isInvalidateSymbols(playerSymbols)) {
-            throw new InvalidParameterException("playerSymbols", playerSymbols.toString());
-        }
-
-        // generate Game UUID
-        gameUUID = generateUUID(gameUUID);
-
-        // generate current game object
-        GameMultiPlayer currentGame = getGameMultiPlayer(playerSymbols, gameUUID);
-
-        // save game in db
-        gameMultiPlayerService.save(currentGame);
-
-        // get list of game multiplayer history
-        List<GameMultiPlayer> gameHistory = gameMultiPlayerService.findByUuid(gameUUID);
-
-        GameMultiPlayerSummary gameSummary = GameMultiPlayerSummary
-                .builder()
-                .uuid(currentGame.getUuid())
-                .playerSymbols(playerSymbols.stream().map(s -> GameSymbolEnum.valueOf(s)).collect(Collectors.toList()))
-                .result(currentGame.getResult())
-                .history(convertToGameMultiPlayerDtos(gameHistory))
-                .build();
-
-        return ResponseEntity
-                .ok()
-                .body(gameSummary);
-    }
-
-    /**
-     * Returns the game summary result for a given {@code playerSymbol} parameter.
-     *
-     * @param playerSymbol Player symbol
-     * @return Game summary result
-     * @throws GameNotFoundException if no game for the given playerSymbol and gameUUID can be found
-     */
-    @RequestMapping(value = "/play/{playerSymbol}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<GameSummary> getGameResult(@PathVariable("playerSymbol") String playerSymbol) {
-        return getGameSummaryResponse(playerSymbol, null);
-    }
-
-    /**
-     * Returns the game summary result for a given {@code playerSymbol} and {@code gameUUID} parameters.
-     *
-     * @param playerSymbol Player symbol
-     * @param gameUUID     Game UUID
-     * @return Game summary result
-     * @throws GameNotFoundException if no game for the given playerSymbol and gameUUID can be found
-     */
-    @RequestMapping(value = "/play/{playerSymbol}/{gameUUID}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<GameSummary> getGameResult(@PathVariable("playerSymbol") String playerSymbol, @PathVariable("gameUUID") String gameUUID) {
-        return getGameSummaryResponse(playerSymbol, gameUUID);
+    @RequestMapping(value = "/play/{gameUUID}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<GameSummary> getGameMultiplePlayersResult(@RequestParam(value = "playerSymbol") List<String> playerSymbols,
+                                                                    @PathVariable("gameUUID") String gameUUID,
+                                                                    @RequestParam(value = "computerGenerated", required = false) boolean isComputerGenerated) {
+        return getGameSummaryResponse(playerSymbols, gameUUID, isComputerGenerated);
     }
 
     /**
      * Generates game summary response object.
      *
-     * @param playerSymbol Player symbol
-     * @param gameUUID     Game UUID
+     * @param playerSymbols Player symbols
+     * @param gameUUID      Game UUID
      * @return Game summary result
      * @throws GameNotFoundException if no game for the given playerSymbol and gameUUID can be found
      */
-    private ResponseEntity<GameSummary> getGameSummaryResponse(String playerSymbol, String gameUUID) {
+    private ResponseEntity<GameSummary> getGameSummaryResponse(List<String> playerSymbols, String gameUUID,
+                                                               boolean isComputerGenerated) {
 
-        if (!isValidateSymbol(playerSymbol)) {
-            throw new InvalidParameterException("playerSymbol", playerSymbol);
+        if (isInvalidateSymbols(playerSymbols)) {
+            throw new InvalidParameterException("playerSymbols", playerSymbols.toString());
         }
+
+        // single player against computer
+        addComputerSymbolForSinglePlayer(playerSymbols, isComputerGenerated);
 
         // generate Game UUID
         gameUUID = generateUUID(gameUUID);
 
         // generate current game object
-        Game currentGame = getGame(playerSymbol, gameUUID);
+        Game currentGame = getGame(playerSymbols, gameUUID);
 
         // save game in db
         gameService.save(currentGame);
@@ -168,9 +105,8 @@ public class GameController {
         GameSummary gameSummary = GameSummary
                 .builder()
                 .uuid(currentGame.getUuid())
-                .playerSymbol(GameSymbolEnum.valueOf(currentGame.getPlayer()))
-                .computerSymbol(GameSymbolEnum.valueOf(currentGame.getComputer()))
-                .result(GameResultEnum.valueOf(currentGame.getResult()))
+                .playerSymbols(playerSymbols.stream().map(s -> GameSymbolEnum.valueOf(s)).collect(Collectors.toList()))
+                .result(currentGame.getResult())
                 .history(convertToGameDtos(gameHistory))
                 .build();
 
@@ -179,31 +115,26 @@ public class GameController {
                 .body(gameSummary);
     }
 
-    private Game getGame(String playerSymbol, String gameUUID) {
-
-        GameSymbolEnum player = GameSymbolEnum.valueOf(playerSymbol);
-        GameSymbolEnum computer = generateRandomSymbol();
-        GameResultEnum gameResult = getGameResult(player, computer);
-
-        return Game
-                .builder()
-                .player(player.name())
-                .computer(computer.name())
-                .result(gameResult.name())
-                .uuid(gameUUID)
-                .date(asDate(LocalDateTime.now())).build();
+    private void addComputerSymbolForSinglePlayer(List<String> playerSymbols, boolean isComputerGenerated) {
+        if (singlePlayerAgainstComputer(playerSymbols, isComputerGenerated)) {
+            playerSymbols.add(generateRandomSymbol().name());
+        }
     }
 
-    private GameMultiPlayer getGameMultiPlayer(List<String> playerSymbols, String gameUUID) {
+    private boolean singlePlayerAgainstComputer(List<String> playerSymbols, boolean isComputerGenerated) {
+        return isComputerGenerated && CollectionUtils.size(playerSymbols) == 1;
+    }
+
+    private Game getGame(List<String> playerSymbols, String gameUUID) {
 
         List<GameSymbolEnum> players = playerSymbols
                 .stream()
                 .map(s -> GameSymbolEnum.valueOf(s))
                 .collect(Collectors.toList());
 
-        GameMultiPlayerResultEnum gameResult = getGameMultiPlayerResult(players);
+        GameResultEnum gameResult = getGameResult(players);
 
-        return GameMultiPlayer
+        return Game
                 .builder()
                 .players(players.stream().map(p -> p.name()).collect(Collectors.toList()))
                 .result(gameResult.linearize())
@@ -212,23 +143,12 @@ public class GameController {
     }
 
     /**
-     * Returns the game result according to the player and computer symbols passed as argument.
-     *
-     * @param player   symbol
-     * @param computer symbol
-     * @return GameResultEnum result
-     */
-    private GameResultEnum getGameResult(GameSymbolEnum player, GameSymbolEnum computer) {
-        return gameResultService.computeResult(player, computer);
-    }
-
-    /**
-     * Returns the game multiplayer result according to the input list of player symbols passed as argument.
+     * Returns the game result according to the input list of player symbols passed as argument.
      *
      * @param players Player symbols
-     * @return GameMultiPlayerResultEnum result
+     * @return GameResultEnum result
      */
-    private GameMultiPlayerResultEnum getGameMultiPlayerResult(List<GameSymbolEnum> players) {
+    private GameResultEnum getGameResult(List<GameSymbolEnum> players) {
         return gameResultService.computeResult(players);
     }
 

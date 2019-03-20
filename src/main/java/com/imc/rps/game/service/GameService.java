@@ -13,21 +13,21 @@ import java.util.Optional;
  * @see Game
  * @see GameServiceImpl
  */
-public interface GameService<T, U> {
+public interface GameService {
     /**
-     * Saves an {@link Optional<Game>} instance.
+     * Saves an {@link Optional< Game >} instance.
      *
      * @param game Game object to save
      */
-    void save(T game);
+    void save(Game game);
 
     /**
-     * Returns an {@link Optional<Game>} instance given {@code id} argument.
+     * Returns an {@link Optional< Game >} instance given {@code id} argument.
      *
      * @param id Game's identifier
      * @return Optional game
      */
-    Optional<T> findById(String id);
+    Optional<Game> findById(String id);
 
     /**
      * Return a list of {@link Game} given {@code uuid} argument.
@@ -35,14 +35,14 @@ public interface GameService<T, U> {
      * @param uuid Game uuid
      * @return List of game history found for a given uuid
      */
-    List<T> findByUuid(String uuid);
+    List<Game> findByUuid(String uuid);
 
     /**
      * Returns a list of all {@link Game}.
      *
      * @return List of games found
      */
-    List<T> findAll();
+    List<Game> findAll();
 
     /**
      * Return a list of {@link Game} given {@link Pageable} argument.
@@ -50,12 +50,12 @@ public interface GameService<T, U> {
      * @param pageable Pageable argument
      * @return List of games found
      */
-    List<T> findAll(Pageable pageable);
+    List<Game> findAll(Pageable pageable);
 
     /**
      * Sets a {@link GameRepository} instance.
      *
      * @param repository Game repository instance
      */
-    void setRepository(U repository);
+    void setRepository(GameRepository repository);
 }

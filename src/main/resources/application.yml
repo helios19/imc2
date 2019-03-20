@@ -25,7 +25,7 @@ spring:
     type: guava
     guava:
       spec: expireAfterAccess=600s
-    cache-names: games,gameMultiPlayers
+    cache-names: games
 
 ## service discovery properties
 #eureka:

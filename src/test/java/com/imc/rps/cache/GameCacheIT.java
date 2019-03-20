@@ -45,7 +45,7 @@ public class GameCacheIT {
 
     @Autowired
     @InjectMocks
-    private GameService<Game, GameRepository> gameService;
+    private GameService gameService;
 
     @Mock
     private GameRepository repository;
@@ -57,9 +57,8 @@ public class GameCacheIT {
 
     private Game sampleGame = Game
             .builder()
-            .player(GameSymbolEnum.SCISSORS.name())
-            .computer(GameSymbolEnum.PAPER.name())
-            .result(GameResultEnum.WIN.name())
+            .players(Lists.newArrayList(GameSymbolEnum.SCISSORS.name(), GameSymbolEnum.PAPER.name()))
+            .result("players 1 - " + GameResultEnum.WIN.name())
             .uuid(GAME_UUID)
             .date(ClassUtils.toDate("1/10/2016 2:51:23 AM"))
             .build();
@@ -136,7 +135,7 @@ public class GameCacheIT {
     public static class TestCacheConfig {
         @Bean
         CacheManager cacheManager() {
-            return new ConcurrentMapCacheManager(ClassUtils.GAMES_COLLECTION_NAME, ClassUtils.GAME_MULTIPLAYERS_COLLECTION_NAME);
+            return new ConcurrentMapCacheManager(ClassUtils.GAMES_COLLECTION_NAME);
         }
     }
 

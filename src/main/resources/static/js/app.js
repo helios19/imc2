@@ -4,7 +4,7 @@ var app = angular.module('rockPaperScissors',['ui.router','ngStorage','ui.bootst
 app.constant('urls', {
     BASE: 'http://localhost:8080/',
     GAME_SERVICE_API : 'http://localhost:8080/rock-paper-scissors/play',
-    GAME_MULTIPLAYER_SERVICE_API : 'http://localhost:8080/rock-paper-scissors/multiplayer'
+    GAME_MULTIPLAYER_SERVICE_API : 'http://localhost:8080/rock-paper-scissors/play'
 });
 
 app.config(['$stateProvider', '$urlRouterProvider',

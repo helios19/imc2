@@ -15,7 +15,8 @@ angular.module('rockPaperScissors').factory('GameService',
                 console.log('Fetching all games given player symbol:' + game.playerSymbol + ' and game uuid:' + game.uuid);
                 var deferred = $q.defer();
                 var uuid = game.uuid !== undefined ? game.uuid : '';
-                $http.get(urls.GAME_SERVICE_API + '/' + game.playerSymbol + '/' + uuid)
+                $http.get(urls.GAME_MULTIPLAYER_SERVICE_API + '/' + uuid + '?computerGenerated=true&playerSymbol=' + game.playerSymbol)
+//                $http.get(urls.GAME_SERVICE_API + '/' + game.playerSymbol + '/' + uuid)
                     .then(
                         function (response) {
                             console.log('Fetched successfully game result');

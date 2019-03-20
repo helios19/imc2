@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Exception thrown when an {@link Game} instance contains invalid field values
- * (e.g {@link Game#player} is null, etc.)
+ * (e.g {@link Game} player is null, etc.)
  *
  * @see Game
  * @see HttpStatus

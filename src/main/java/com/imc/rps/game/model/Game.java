@@ -11,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 import static com.imc.rps.common.utils.ClassUtils.DATE_FORMAT_PATTERN;
 
@@ -32,12 +33,7 @@ public class Game {
     @Field
     @Indexed
     @NotNull
-    private String player;
-
-    @Field
-    @Indexed
-    @NotNull
-    private String computer;
+    private List<String> players;
 
     @Field
     @Indexed

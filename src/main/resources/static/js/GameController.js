@@ -59,16 +59,16 @@ angular.module('rockPaperScissors').controller('GameController',
                         function (response) {
                             console.log('Games loaded successfully');
                             console.log('uuid : ' + response.data.uuid);
-                            console.log('player : ' + response.data.player);
-                            console.log('computer : ' + response.data.computer);
+                            console.log('player : ' + response.data.playerSymbols[0]);
+                            console.log('computer : ' + response.data.playerSymbols[1]);
                             console.log('result : ' + response.data.result);
                             self.errorMessage='';
                             self.done = true;
-                            self.previousGames = response.data.history;
-                            self.game.playerSymbol = response.data.playerSymbol;
-                            self.game.computerSymbol = response.data.computerSymbol;
+                            self.previousGames = getGameHistory(response.data.history);
+                            self.game.playerSymbol = response.data.playerSymbols[0];
+                            self.game.computerSymbol = response.data.playerSymbols[1];
                             self.game.uuid = response.data.uuid;
-                            self.gameResult = response.data.result;
+                            self.gameResult = getGameResult(response.data.result);
                             $scope.myForm.$setPristine();
                         },
                         function (errResponse) {
@@ -78,6 +78,31 @@ angular.module('rockPaperScissors').controller('GameController',
                     );
 
                 }
+        }
+
+        function getGameResult(result) {
+            if (result.includes('1 - WIN')) {
+                return 'WIN'
+            } else if (result.includes('DRAW')) {
+                return 'DRAW';
+            } else {
+                return 'LOSE';
+            }
+        }
+
+        function getGameHistory(previousGames) {
+            var gameHistory = [];
+            previousGames.forEach(function (arrayItem) {
+                var game = new Object();
+                game.date = arrayItem.date;
+                game.player = arrayItem.players[0];
+                game.computer = arrayItem.players[1];
+                game.result = getGameResult(arrayItem.result);
+                gameHistory.push(game);
+                console.log("game : " + game);
+            });
+
+            return gameHistory;
         }
 
         function reset(){

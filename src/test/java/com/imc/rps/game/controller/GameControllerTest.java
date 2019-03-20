@@ -4,9 +4,9 @@ import com.google.common.collect.Lists;
 import com.imc.rps.common.utils.ClassUtils;
 import com.imc.rps.game.model.Game;
 import com.imc.rps.game.model.GameResultEnum;
-import com.imc.rps.game.service.GameResultService;
-import com.imc.rps.game.service.GameService;
 import com.imc.rps.game.model.GameSymbolEnum;
+import com.imc.rps.game.service.GameService;
+import com.imc.rps.game.service.GameResultService;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.Before;
@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import static com.jayway.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -52,9 +53,8 @@ public class GameControllerTest {
 
     private Game game = Game
             .builder()
-            .player(GameSymbolEnum.SCISSORS.name())
-            .computer(GameSymbolEnum.PAPER.name())
-            .result(GameResultEnum.WIN.name())
+            .players(Lists.newArrayList(GameSymbolEnum.SCISSORS.name(), GameSymbolEnum.PAPER.name()))
+            .result("players 1 - " + GameResultEnum.WIN.name())
             .uuid(UUID.randomUUID().toString())
             .date(ClassUtils.toDate("1/10/2016 2:51:23 AM"))
             .build();
@@ -76,26 +76,25 @@ public class GameControllerTest {
         when(gameService.findByUuid(any(String.class)))
                 .thenReturn(Lists.newArrayList(game));
 
-        when(gameResultService.computeResult(any(GameSymbolEnum.class), any(GameSymbolEnum.class)))
+        when(gameResultService.computeResult(anyListOf(GameSymbolEnum.class)))
                 .thenReturn(GameResultEnum.WIN);
 
         given().
                 when().
-                get("/rock-paper-scissors/play/" + GameSymbolEnum.SCISSORS.name() + "/" + game.getUuid()).
+                get("/rock-paper-scissors/play/"  + game.getUuid() + "?computerGenerated=true&playerSymbol=" + GameSymbolEnum.SCISSORS.name()).
                 then().
                 statusCode(HttpServletResponse.SC_OK).
                 contentType(ContentType.JSON).
-                body("playerSymbol", equalTo(game.getPlayer())).
-                body("computerSymbol", notNullValue()).
-                body("result", equalTo(game.getResult())).
+                body("playerSymbols", hasItem(GameSymbolEnum.SCISSORS.name())).
+                body("result", notNullValue()).
                 body("uuid", equalTo(game.getUuid())).
                 body("history", notNullValue()).
-                log().all(true);
+                log().all();
 
         verify(gameService, times(1)).findByUuid(any(String.class));
         verify(gameService, times(1)).save(any(Game.class));
         verifyNoMoreInteractions(gameService);
-        verify(gameResultService, times(1)).computeResult(any(GameSymbolEnum.class), any(GameSymbolEnum.class));
+        verify(gameResultService, times(1)).computeResult(anyListOf(GameSymbolEnum.class));
         verifyNoMoreInteractions(gameResultService);
     }
 

@@ -8,8 +8,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * Game Summary DTO class gathering game details including {@link #uuid}, {@link #playerSymbol}
- * {@link #computerSymbol} {@link #result} and {@link #history}.
+ * Game Summary DTO class gathering game details including {@link #uuid}, {@link #playerSymbols}
+ * {@link #result} and {@link #history}.
  *
  * @see GameDto
  * @see GameResultEnum
@@ -18,9 +18,7 @@ import java.util.List;
 @Builder
 public class GameSummary {
     private String uuid;
-    private GameSymbolEnum playerSymbol;
-    private GameSymbolEnum computerSymbol;
-    private GameResultEnum result;
+    private List<GameSymbolEnum> playerSymbols;
+    private String result;
     private List<GameDto> history;
-
 }

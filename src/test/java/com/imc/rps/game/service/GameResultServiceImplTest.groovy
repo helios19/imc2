@@ -1,6 +1,5 @@
 package com.imc.rps.game.service
 
-import com.imc.rps.game.model.GameMultiPlayerResultEnum
 import com.imc.rps.game.model.GameResultEnum
 import com.imc.rps.game.model.GameSymbolEnum
 import spock.lang.Specification
@@ -25,13 +24,13 @@ class GameResultServiceImplTest extends Specification {
         player                  | computer                | result
         GameSymbolEnum.PAPER    | GameSymbolEnum.PAPER    | GameResultEnum.DRAW
         GameSymbolEnum.PAPER    | GameSymbolEnum.ROCK     | GameResultEnum.WIN
-        GameSymbolEnum.PAPER    | GameSymbolEnum.SCISSORS | GameResultEnum.LOSE
+        GameSymbolEnum.PAPER    | GameSymbolEnum.SCISSORS | GameResultEnum.WIN
         GameSymbolEnum.ROCK     | GameSymbolEnum.ROCK     | GameResultEnum.DRAW
-        GameSymbolEnum.ROCK     | GameSymbolEnum.PAPER    | GameResultEnum.LOSE
+        GameSymbolEnum.ROCK     | GameSymbolEnum.PAPER    | GameResultEnum.WIN
         GameSymbolEnum.ROCK     | GameSymbolEnum.SCISSORS | GameResultEnum.WIN
         GameSymbolEnum.SCISSORS | GameSymbolEnum.SCISSORS | GameResultEnum.DRAW
         GameSymbolEnum.SCISSORS | GameSymbolEnum.PAPER    | GameResultEnum.WIN
-        GameSymbolEnum.SCISSORS | GameSymbolEnum.ROCK     | GameResultEnum.LOSE
+        GameSymbolEnum.SCISSORS | GameSymbolEnum.ROCK     | GameResultEnum.WIN
 
     }
 
@@ -41,21 +40,21 @@ class GameResultServiceImplTest extends Specification {
         given:
 
         when: "invoking gameResult service"
-        GameMultiPlayerResultEnum computedResult = gameResultService.computeResult(players)
+        GameResultEnum computedResult = gameResultService.computeResult(players)
 
         then:
         computedResult == result
 
         where:
         players                                                     | result
-        [GameSymbolEnum.ROCK]                                       | GameMultiPlayerResultEnum.WIN
-        [GameSymbolEnum.PAPER, GameSymbolEnum.PAPER]                | GameMultiPlayerResultEnum.DRAW
+        [GameSymbolEnum.ROCK]                                       | GameResultEnum.WIN
+        [GameSymbolEnum.PAPER, GameSymbolEnum.PAPER]                | GameResultEnum.DRAW
         [GameSymbolEnum.PAPER, GameSymbolEnum.ROCK,
-         GameSymbolEnum.SCISSORS]                                   | GameMultiPlayerResultEnum.DRAW
+         GameSymbolEnum.SCISSORS]                                   | GameResultEnum.DRAW
         [GameSymbolEnum.PAPER, GameSymbolEnum.ROCK,
-         GameSymbolEnum.SCISSORS, GameSymbolEnum.SCISSORS]          | GameMultiPlayerResultEnum.WIN
+         GameSymbolEnum.SCISSORS, GameSymbolEnum.SCISSORS]          | GameResultEnum.WIN
         [GameSymbolEnum.PAPER, GameSymbolEnum.ROCK,
-         GameSymbolEnum.SCISSORS, GameSymbolEnum.SCISSORS]          | GameMultiPlayerResultEnum.WIN
+         GameSymbolEnum.SCISSORS, GameSymbolEnum.SCISSORS]          | GameResultEnum.WIN
 
     }
 
